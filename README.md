@@ -1,6 +1,6 @@
 # NFTX ADDRESS LOOKUP
 
-##SETUP
+## SETUP
 
 Visit https://etherscan.io/exportData?type=address&a=0xbe86f647b167567525ccaafcd6f881f1ee558216 to download all
 transaction hashes for the NFTX contract. NOTE: Make sure to set the data start date back a bit.
