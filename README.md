@@ -10,9 +10,7 @@ Also don't forget to place the csv file in this project's directory!
 
 Next, run the following...
 
-'''
-python scrape_etherscan.py
-'''
+'''python scrape_etherscan.py'''
 
 This will check for any new transaction hashes since the last running of this script.  If any new transaction hashes are found, the script will print out how many new transactions need to be processed, and the script will visit those transaction pages.  If those transactions are not errors (e.g. 'out of gas') and the executed method is 'Create Vault', the script will write the [transaction_hash, NFTX vault contract address] for that transaction to an internal csv file named __vault_addresses.csv__. 
 
