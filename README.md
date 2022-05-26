@@ -5,8 +5,13 @@
 Visit https://etherscan.io/exportData?type=address&a=0xbe86f647b167567525ccaafcd6f881f1ee558216 to download all
 transaction hashes for the NFTX contract. NOTE: Make sure to set the data start date back a bit.
 After the file is downloaded, etiher rename the file to __etherscan_export.csv__ or go into the __nftx_constants.py__ file
-and change the __ETHERSCAN_EXPORT_CSV_PATH = "./csvs/etherscan_export.csv"__ to match the csv file name.
-Also don't forget to place the csv file in this project's directory in the __csvs__ folder!
+and change the __ETHERSCAN_EXPORT_CSV_PATH = "./csvs/etherscan_export.csv"__ to match the csv file name.  Then you'll want to navigate to the __csvs__
+folder in the project directory.  Delete the old __etherscan_export.csv__ file by running the following command:
+```
+rm etherscan_export.csv
+```
+
+And then place the newly downloaded csv file in the __csvs__ folder!
 
 If you have an OpenSea API key, put that in the __nftx_constants.py__ file under the constant __OPENSEA_API_KEY__. NOTE: that if you do provide an 
 OpenSea API key that the constant __SLEEP_PERIOD__ can be reduced from 3 seconds.
