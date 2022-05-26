@@ -6,14 +6,7 @@ import time
 
 import requests
 
-
-DATA_CSV_PATH = "./nftx_vaults_info.csv" #Input
-
-COMBINED_CSV = "./nftx_vaults_info_w_slug.csv" #With slugs present / Output
-
-OPENSEA_API_KEY = ""
-
-SLEEP_PERIOD = 3
+import nftx_constants
 
 
 class SkipError(Exception):
@@ -24,7 +17,7 @@ def return_collections_already_called():
     already_called = []
     
     try:
-        with open(COMBINED_CSV, 'r') as outfile:
+        with open(nftx_constants.COMBINED_CSV, 'r') as outfile:
             csv_reader = csv.reader(outfile)
             for row in csv_reader:
                 already_called.append(row[contract_address_index])
@@ -38,7 +31,7 @@ def find_data_to_alter(already_called_list):
     data_add_in = []
 
     collection_address_index = 2
-    with open(DATA_CSV_PATH, 'r') as in_file:
+    with open(nftx_constants.DATA_CSV_PATH, 'r') as in_file:
         csv_reader = csv.reader(in_file)
         for row in csv_reader:
             if row[collection_address_index] not in already_called_list:
@@ -73,7 +66,7 @@ def retrieve_collection_slug(session, asset_contract_address):
 
 def save_to_out_file(revised_data):
     print("Writing to csv...")
-    with open(COMBINED_CSV, 'a') as out_file:
+    with open(nftx_constants.COMBINED_CSV, 'a') as out_file:
         csv_writer = csv.writer(out_file)
         csv_writer.writerows(revised_data)
     print("Write finished.")
@@ -83,7 +76,7 @@ def update_csv():
 
     session = requests.Session()
 
-    session.headers = {'X-API-KEY' : OPENSEA_API_KEY}
+    session.headers = {'X-API-KEY' : nftx_constants.OPENSEA_API_KEY}
 
     data_to_alter = find_data_to_alter(already_called_list)
 
@@ -100,10 +93,10 @@ def update_csv():
             #print(revised_data)
 
         except SkipError:
-            time.sleep(SLEEP_PERIOD)
+            time.sleep(nftx_constants.SLEEP_PERIOD)
             continue
 
-        time.sleep(SLEEP_PERIOD)
+        time.sleep(nftx_constants.SLEEP_PERIOD)
 
         if ct % 15 == 0:
             save_to_out_file(revised_data)

@@ -11,28 +11,23 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.common.exceptions import TimeoutException
 
-ETHERSCAN_EXPORT_CSV_PATH = "./etherscan_export.csv"
-VAULT_ADDRESSES_CSV = "./vault_addresses.csv"
-
-METHOD_INDEX = 15
-METHOD_VAL = "Create Vault"
-
-STATUS_INDEX = 13
-STATUS_VAL = ''
+import nftx_constants
 
 
 def get_all_txn_hashes_to_visit():
     """Open etherscan vault csv and collect all hashes to visit"""
     transaction_hashes = []
-    with open(ETHERSCAN_EXPORT_CSV_PATH, 'r') as in_file:
+    with open(nftx_constants.ETHERSCAN_EXPORT_CSV_PATH, 'r') as in_file:
         csv_reader = csv.reader(in_file)
         for row in csv_reader:
             
-            if row[METHOD_INDEX] == METHOD_VAL:
-                if row[STATUS_INDEX] == STATUS_VAL:
+            #If the txn is both a 'create vault' and not a failed txn
+            if row[nftx_constants.METHOD_INDEX] == nftx_constants.METHOD_VAL:
+                if row[nftx_constants.STATUS_INDEX] == nftx_constants.STATUS_VAL:
                     transaction_hashes.append(row[0]) #Hash value
 
     return transaction_hashes
+
 
 def visit_hash_and_get_vault_address(driver, txn_hash):
     url = f"https://etherscan.io/tx/{txn_hash}#internal"
@@ -43,7 +38,7 @@ def visit_hash_and_get_vault_address(driver, txn_hash):
     #Get vault_address
     wait = WebDriverWait(driver, 10)
     try:
-        vault_address = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, ".table > tbody:nth-child(2) > tr:nth-child(1) > td:nth-child(4) > a:nth-child(3)")))
+        vault_address = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, nftx_constants.VAULT_ADDRESS_SELECTOR)))
         vault_address = vault_address.text
         assert vault_address, "No vault address!"
         return [txn_hash, vault_address]
@@ -51,17 +46,19 @@ def visit_hash_and_get_vault_address(driver, txn_hash):
     except TimeoutException:
         return [txn_hash, "TIMEOUT"]
 
+
 def save_addresses_to_csv(address_hash_pairings):
     print("Saving progress...")
-    with open(VAULT_ADDRESSES_CSV, 'a') as save_file:
+    with open(nftx_constants.VAULT_ADDRESSES_CSV, 'a') as save_file:
         csv_writer = csv.writer(save_file)
         csv_writer.writerows(address_hash_pairings)
     print("Progress saved!")
 
+
 def return_visited_hashes():
     hash_list = []
     try:
-        with open(VAULT_ADDRESSES_CSV, 'r') as save_file:
+        with open(nftx_constants.VAULT_ADDRESSES_CSV, 'r') as save_file:
             csv_reader = csv.reader(save_file)
             for row in csv_reader:
                 hash_list.append(row[0]) #[hash, vault_address]
@@ -69,6 +66,7 @@ def return_visited_hashes():
 
     except FileNotFoundError:
         return hash_list
+
 
 def return_all_vault_addresses():
     vault_addresses = []

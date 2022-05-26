@@ -8,11 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
-VAULT_ADDRESSES_CSV = "./vault_addresses.csv"
-ALL_DATA_CSV = "./nftx_vaults_info.csv"
-NFT_ADDRESS_SELECTOR = "a.ml-2:nth-child(2)"
-WETH_ADDRESS_SELECTOR = "h4.inline-flex:nth-child(5) > span:nth-child(2) > a:nth-child(1)"
-ETHERSCAN_BASE_URL = "https://etherscan.io/address/"
+import nftx_constants
 
 def retrieve_vault_addresses_from_csv(csv_file, col_num):
     vault_addresses = []
@@ -33,14 +29,14 @@ def visit_nftx_info_page_and_retrieve_data(driver, vault_address):
 
     try:
         wait = WebDriverWait(driver, 30)
-        nft_address_element = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, NFT_ADDRESS_SELECTOR)))
+        nft_address_element = wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, nftx_constants.NFT_ADDRESS_SELECTOR)))
         
         nft_address_href = nft_address_element.get_attribute('href')
-        nft_address = nft_address_href.replace(ETHERSCAN_BASE_URL, '')
+        nft_address = nft_address_href.replace(nftx_constants.ETHERSCAN_BASE_URL, '')
 
-        weth_address_element = driver.find_element(By.CSS_SELECTOR, WETH_ADDRESS_SELECTOR)
+        weth_address_element = driver.find_element(By.CSS_SELECTOR, nftx_constants.WETH_ADDRESS_SELECTOR)
         weth_address_href = weth_address_element.get_attribute('href')
-        weth_address = weth_address_href.replace(ETHERSCAN_BASE_URL, '')
+        weth_address = weth_address_href.replace(nftx_constants.ETHERSCAN_BASE_URL, '')
 
     except (TimeoutException, NoSuchElementException):
         nft_address = 'ERROR'
@@ -50,19 +46,19 @@ def visit_nftx_info_page_and_retrieve_data(driver, vault_address):
 
 def write_results_to_csv(data_queue):
     print("Writing to csv...")
-    with open(ALL_DATA_CSV, 'a') as out_file:
+    with open(nftx_constants.ALL_DATA_CSV, 'a') as out_file:
         csv_writer = csv.writer(out_file)
         csv_writer.writerows(data_queue)
     print("Done writing to csv.")
     
 def scrape_all():
     """Main"""
-    vault_addresses = retrieve_vault_addresses_from_csv(VAULT_ADDRESSES_CSV, 1)
+    vault_addresses = retrieve_vault_addresses_from_csv(nftx_constants.VAULT_ADDRESSES_CSV, 1)
 
     #Clean 'TIMEOUT's
     vault_addresses = [a for a in vault_addresses if a != "TIMEOUT"]
 
-    existing_vault_addresses =  retrieve_vault_addresses_from_csv(ALL_DATA_CSV, 0)
+    existing_vault_addresses =  retrieve_vault_addresses_from_csv(nftx_constants.ALL_DATA_CSV, 0)
 
     new_vault_addresses = [a for a in vault_addresses if a not in existing_vault_addresses]
 
